@@ -3,94 +3,42 @@ package uk.ac.cam.cas217.fjava.tick0;
 import java.util.Arrays;
 
 public class RadixSort {
-    public static int[] radixSort(int[] input){
+    public static int[] radixSortInPlace(int[] input){
+        return inplacePartition(input, 0, input.length, 31);
+    }
 
-        int positiveCount = positiveCountOfArray(input);
-        int negativeCount = input.length - positiveCount;
+    private static int[] inplacePartition(int[] toPartition, int start, int end, int place) {
+        int lesserPartition = start;
+        int greaterPartition = end;
 
-        int[] positives = new int[positiveCount];
-        int[] negatives = new int[negativeCount];
-        int positiveIndex = 0;
-        int negativeIndex = 0;
+        while (lesserPartition != greaterPartition) {
+            boolean bit = ((toPartition[lesserPartition] >> place) & 1) == 1;
 
-        for (int index = 0; index < input.length; index ++) {
-            int value = input[index];
+            if (place == 31) {
+                bit = !bit;
+            }
 
-            if (value >= 0) {
-                positives[positiveIndex] = value;
-                positiveIndex ++;
+            if (!bit) {
+                lesserPartition ++;
             } else {
-                negatives[negativeIndex] = value;
-                negativeIndex ++;
+                int valueInGreaterPartition = toPartition[greaterPartition - 1];
+                toPartition[greaterPartition - 1] = toPartition[lesserPartition];
+                toPartition[lesserPartition] = valueInGreaterPartition;
+
+                greaterPartition --;
             }
         }
 
+        if (place > 0) {
+            if (start < lesserPartition - 1) {
+                inplacePartition(toPartition, start, lesserPartition, place - 1);
+            }
 
-        positives = partialRadixSort(positives);
-        negatives = partialRadixSort(negatives);
-
-        int[] result = new int[input.length];
-
-
-        for (int index = negativeCount - 1; index >= 0; index --) {
-            result[negativeCount - index - 1] = negatives[index];
-        }
-
-        for (int index = 0; index < positiveCount; index ++) {
-            result[index + negativeCount] = positives[index];
-        }
-
-        return result;
-    }
-
-    private static int[] partialRadixSort(int[] input) {
-        // Largest place for a 32-bit int is the 1 billion's place
-        for(int place=1; place <= 1000000000; place *= 10){
-            // Use counting sort at each digit's place
-            input = countingSort(input, place);
-        }
-
-        return input;
-    }
-
-    private static int positiveCountOfArray(int[] array) {
-        int positiveCount = 0;
-        for(int index = 0; index < array.length; index ++) {
-            if (array[index] >= 0) {
-                positiveCount ++;
+            if (greaterPartition < end - 1) {
+                inplacePartition(toPartition, greaterPartition, end, place - 1);
             }
         }
 
-        return positiveCount;
+        return toPartition;
     }
-
-    private static int[] countingSort(int[] input, int place){
-        int[] out = new int[input.length];
-
-        int[] count = new int[10];
-
-        for(int i=0; i < input.length; i++){
-            int digit = getDigit(input[i], place);
-            count[digit] += 1;
-        }
-
-        for(int i=1; i < count.length; i++){
-            count[i] += count[i-1];
-        }
-
-        for(int i = input.length-1; i >= 0; i--){
-            int digit = getDigit(input[i], place);
-
-            out[count[digit]-1] = input[i];
-            count[digit]--;
-        }
-
-        return out;
-
-    }
-
-    private static int getDigit(int value, int digitPlace){
-        return Math.abs((value/digitPlace ) % 10);
-    }
-
 }

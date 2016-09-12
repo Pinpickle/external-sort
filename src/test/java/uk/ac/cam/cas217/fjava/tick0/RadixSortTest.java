@@ -16,7 +16,7 @@ public class RadixSortTest {
     public void radixSortsWithPositiveIntegers() {
         assertArrayEquals(
             new int[] {1, 3, 4, 5, 6, 7, 8, 9},
-            RadixSort.radixSort(new int[] {3, 5, 1, 6, 4, 7, 9, 8})
+            RadixSort.radixSortInPlace(new int[] {3, 5, 1, 6, 4, 7, 9, 8})
         );
     }
 
@@ -24,7 +24,7 @@ public class RadixSortTest {
     public void radixSortsWithPositiveAndNegativeIntegers() {
         assertArrayEquals(
             new int[] {-9, -8, -7, -6, 1, 3, 4, 5},
-            RadixSort.radixSort(new int[] {3, 5, 1, -6, 4, -7, -9, -8})
+            RadixSort.radixSortInPlace(new int[] {3, 5, 1, -6, 4, -7, -9, -8})
         );
     }
 
@@ -34,7 +34,7 @@ public class RadixSortTest {
         int[] expectedInts = IntStream.of(ints).sorted().toArray();
 
         long timeNow = System.nanoTime();
-        int[] sortedInts = RadixSort.radixSort(ints);
+        int[] sortedInts = RadixSort.radixSortInPlace(ints);
         System.out.println(String.format("Radix sort of 10000 integers took %d micro seconds", (System.nanoTime() - timeNow) / 1000));
 
         assertArrayEquals(

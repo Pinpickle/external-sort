@@ -37,11 +37,10 @@ class MemorySortPass extends ExternalSortPass {
             values[(int) (index - start)] = inputStream.readInt();
         }
 
-        values = RadixSort.radixSort(values);
+        RadixSort.radixSortInPlace(values);
 
-        // System.out.println("T=====================");
-        boolean first = true;
-        int past = 0;
+        inputStream.close();
+
         for (long index = start; index < finish; index ++) {
             destinationStream.writeInt(values[(int) (index - start)]);
         }
@@ -51,7 +50,7 @@ class MemorySortPass extends ExternalSortPass {
 
     private long calculateBlockSize() {
         System.gc();
-        long blockSize = Math.min(Runtime.getRuntime().freeMemory() / 25, Math.min(Integer.MAX_VALUE, intsInFile));
+        long blockSize = Math.min(Runtime.getRuntime().freeMemory() / 40, Math.min(Integer.MAX_VALUE, intsInFile));
 
         if (blockSize == 0) {
             return 0;
