@@ -47,6 +47,7 @@ public class ExternalSorterTest {
         Files.copy(getSourcePath(index + 1), Paths.get(testSourcePath), StandardCopyOption.REPLACE_EXISTING);
         Files.copy(getTempPath(index + 1), Paths.get(testTempPath), StandardCopyOption.REPLACE_EXISTING);
 
+        System.out.println(String.format("==== Sorting %s", index));
         long startTime = System.nanoTime();
         new ExternalSorter(testSourcePath, testTempPath).sort();
         long endTime = System.nanoTime();
@@ -64,11 +65,10 @@ public class ExternalSorterTest {
     @Test
     public void testSort() throws IOException {
 
-        for (int i = 0; i < checksums.length; i ++) {
-            System.out.println(String.format("==== Sorting %s", i));
+        for (int index = 0; index < checksums.length; index ++) {
             assertEquals(
-                checksums[i],
-                sortFileAndGetChecksum(i)
+                checksums[index],
+                sortFileAndGetChecksum(index)
             );
         }
 

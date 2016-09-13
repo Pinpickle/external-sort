@@ -11,6 +11,7 @@ class MemorySortPass extends ExternalSortPass {
 
     @Override
     public void performSortPass() throws IOException {
+        System.out.println("Performing in-memory sort");
         sourceAccessFile.seek(0);
         blockSize = calculateBlockSize();
 
@@ -50,7 +51,7 @@ class MemorySortPass extends ExternalSortPass {
 
     private long calculateBlockSize() {
         System.gc();
-        long blockSize = Math.min(Runtime.getRuntime().freeMemory() / 40, Math.min(Integer.MAX_VALUE, intsInFile));
+        long blockSize = Math.min(Runtime.getRuntime().freeMemory() / 7, Math.min(Integer.MAX_VALUE, intsInFile));
 
         if (blockSize == 0) {
             return 0;
