@@ -35,7 +35,7 @@ class ExternalSorter {
         }
 
         if (reversed) {
-            new MergeSortPass(originalFileHandle, dataFileHandle, true, fileLength).performSortPass();
+            new CopyPass(originalFileHandle, dataFileHandle, true).performSortPass();
         }
     }
 }
