@@ -2,6 +2,8 @@ package uk.ac.cam.cas217.fjava.tick0;
 
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 class MergeSortPass extends ExternalSortPass {
@@ -14,64 +16,48 @@ class MergeSortPass extends ExternalSortPass {
 
     @Override
     public void performSortPass() throws IOException {
-        System.out.println(String.format("Merging blocksize %s", blockSize));
+        System.out.println(String.format("Merging blocksize %d", blockSize));
 
-        for (long offset = 0; offset * blockSize * 2 < intsInFile; offset += 1) {
-            //System.out.println("BLOCK");
-            merge(offset);
-        }
-
-
-
+        merge();
 
         destinationStream.flush();
         destinationStream.close();
         sourceAccessFile.close();
     }
 
-    private void merge(long offset) throws IOException {
-        long start = blockSize * offset * 2;
+    private void merge() throws IOException {
+        List<MergeSource> mergeSourceList = new LinkedList<>();
+        for (long index = 0; index < intsInFile; index += blockSize) {
+            mergeSourceList.add(new MergeSource(sourceFile, Math.min(index, intsInFile), Math.min(index + blockSize, intsInFile)));
+        }
 
-        MergeSource source1 = new MergeSource(sourceFile, start, intsInFile);
-        MergeSource source2 = new MergeSource(sourceFile, Math.min(start + blockSize, intsInFile), intsInFile);
-        long end1 = source2.getIndex();
-        long end2 = Math.min(source2.getIndex() + blockSize, intsInFile);
-        RandomAccessFile randomAccessFile = new RandomAccessFile(destinationFile, "rw");
+        boolean mergeFound;
 
-        long index = start;
+        MergeSource[] mergeSources = mergeSourceList.toArray(new MergeSource[0]);
 
-        while (source1.getIndex() < end1 || source2.getIndex() < end2) {
-            int dataToWrite;
+        System.out.println(String.format("Merging %d blocks", mergeSources.length));
 
-            if (source2.getIndex() >= end2) {
-                dataToWrite = source1.getValue();
-                source1.increaseIndex();
-            } else if (source1.getIndex() >= end1) {
-                dataToWrite = source2.getValue();
-                source2.increaseIndex();
-            } else {
-                if (source1.getValue() < source2.getValue()) {
-                    dataToWrite = source1.getValue();
-                    source1.increaseIndex();
-                } else {
-                    dataToWrite = source2.getValue();
-                    source2.increaseIndex();
+        do {
+            int smallestIndex = 0;
+            mergeFound = false;
+            for (int index = 0; index < mergeSources.length; index ++) {
+                if (mergeSources[index].hasRemaining() &&
+                    ((!mergeFound) || (mergeSources[index].getValue() < mergeSources[smallestIndex].getValue()))) {
+                    smallestIndex = index;
+                    mergeFound = true;
                 }
             }
 
-            //System.out.println(dataToWrite);
+            if (mergeFound) {
+                destinationStream.writeInt(mergeSources[smallestIndex].getValue());
+                mergeSources[smallestIndex].increaseIndex();
+            }
+        } while (mergeFound);
 
-            /*randomAccessFile.seek(index);
-            randomAccessFile.writeInt(dataToWrite);
 
-            index ++;*/
-
-            destinationStream.writeInt(dataToWrite);
-
+        for (MergeSource mergeSource : mergeSources) {
+            mergeSource.close();
         }
-
-        source1.close();
-        source2.close();
     }
 
     private static class MergeSource implements Closeable {
@@ -79,23 +65,20 @@ class MergeSortPass extends ExternalSortPass {
 
         private long index;
         private int currentValue;
-        private RandomAccessFile accessFile;
-        private long intsInFile;
-        private boolean isValueValid = false;
+        private long endIntIndex;
 
-        private MergeSource(File sourceFile, long startIntIndex, long intsInFile) throws IOException {
+        private MergeSource(File sourceFile, long startIntIndex, long endIntIndex) throws IOException {
             inputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(sourceFile)));
             inputStream.skip(startIntIndex * 4);
-            accessFile = new RandomAccessFile(sourceFile, "r");
             index = startIntIndex - 1;
-            this.intsInFile = intsInFile;
+            this.endIntIndex = endIntIndex;
             increaseIndex();
         }
 
 
         public void increaseIndex() throws IOException {
             index ++;
-            if (index < intsInFile) {
+            if (hasRemaining()) {
                 currentValue = inputStream.readInt();
             }
         }
@@ -104,14 +87,13 @@ class MergeSortPass extends ExternalSortPass {
             return currentValue;
         }
 
-        public long getIndex() {
-            return index;
+        public boolean hasRemaining() {
+            return index < endIntIndex;
         }
 
         @Override
         public void close() throws IOException {
             inputStream.close();
-            accessFile.close();
         }
     }
 }

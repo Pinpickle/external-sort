@@ -28,10 +28,10 @@ class ExternalSorter {
         long fileLength = originalFileHandle.length() / 4;
         boolean reversed = true;
 
-        for (; blockSize < fileLength; blockSize *= 2) {
-            new MergeSortPass(originalFileHandle, dataFileHandle, reversed, blockSize).performSortPass();
+        if (blockSize < fileLength) {
+            new MergeSortPass(originalFileHandle, dataFileHandle, true, blockSize).performSortPass();
 
-            reversed = !reversed;
+            reversed = false;
         }
 
         if (reversed) {

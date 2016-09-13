@@ -51,7 +51,7 @@ class MemorySortPass extends ExternalSortPass {
 
     private long calculateBlockSize() {
         System.gc();
-        long blockSize = Math.min(Runtime.getRuntime().freeMemory() / 7, Math.min(Integer.MAX_VALUE, intsInFile));
+        long blockSize = Math.min(Runtime.getRuntime().freeMemory() / 6, Math.min(Integer.MAX_VALUE, intsInFile));
 
         if (blockSize == 0) {
             return 0;
