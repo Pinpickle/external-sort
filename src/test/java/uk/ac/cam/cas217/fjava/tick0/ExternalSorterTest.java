@@ -2,6 +2,8 @@ package uk.ac.cam.cas217.fjava.tick0;
 
 import org.junit.Test;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.*;
 
@@ -30,6 +32,7 @@ public class ExternalSorterTest {
         "468c1c2b4c1b74ddd44ce2ce775fb35c",
         "79d830e4c0efa93801b5d89437f9f3e",
         "c7477d400c36fca5414e0674863ba91",
+        "cc80f01b7d2d26042f3286bdeff0d9",
         "cc80f01b7d2d26042f3286bdeff0d9"
     };
     private static final String testSourcePath = "./test-suite/testSource.dat";
@@ -47,12 +50,15 @@ public class ExternalSorterTest {
         Files.copy(getSourcePath(index + 1), Paths.get(testSourcePath), StandardCopyOption.REPLACE_EXISTING);
         Files.copy(getTempPath(index + 1), Paths.get(testTempPath), StandardCopyOption.REPLACE_EXISTING);
 
+
         System.out.println(String.format("==== Sorting %s", index));
         long startTime = System.nanoTime();
         new ExternalSorter(testSourcePath, testTempPath).sort();
         long endTime = System.nanoTime();
 
         System.out.println(String.format("= Sorted in %d ms", (endTime - startTime) / 1000000));
+
+
 
         System.gc();
 
@@ -64,8 +70,9 @@ public class ExternalSorterTest {
 
     @Test
     public void testSort() throws IOException {
+        //System.out.println(ExternalSort.checkSum("./test-suite/test18a.dat"));
 
-        for (int index = 16; index < checksums.length; index ++) {
+        for (int index = 0; index < checksums.length; index ++) {
             assertEquals(
                 checksums[index],
                 sortFileAndGetChecksum(index)

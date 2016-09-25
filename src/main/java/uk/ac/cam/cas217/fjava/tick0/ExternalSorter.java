@@ -1,5 +1,7 @@
 package uk.ac.cam.cas217.fjava.tick0;
 
+import uk.ac.cam.cas217.fjava.tick0.merge.MergeSortPass;
+
 import java.io.*;
 
 /**
@@ -21,21 +23,30 @@ class ExternalSorter {
         File originalFileHandle = new File(originalFilePath);
         File dataFileHandle = new File(dataFilePath);
 
-        MemorySortPass initialPass = new MemorySortPass(originalFileHandle, dataFileHandle);
-        initialPass.performSortPass();
+        long intsInFile = originalFileHandle.length() / 4;
+        long blockSize = calculateInitialBlockSize(intsInFile);
 
-        long blockSize = initialPass.getBlockSize();
-        long fileLength = originalFileHandle.length() / 4;
-        boolean reversed = true;
+        if (blockSize == intsInFile) {
+            // We can perform the entire sort in memory, no need for the data file
+            new MemorySortPass(originalFileHandle, originalFileHandle, blockSize).performSortPass();
+        } else {
+            new MemorySortPass(originalFileHandle, dataFileHandle, blockSize).performSortPass();
+            new MergeSortPass(dataFileHandle, originalFileHandle, blockSize).performSortPass();
+        }
+    }
 
-        if (blockSize < fileLength) {
-            new MergeSortPass(originalFileHandle, dataFileHandle, true, blockSize).performSortPass();
+    private long calculateInitialBlockSize(long intsInFile) {
+        System.gc();
+        long blockSize = Math.min(Runtime.getRuntime().freeMemory() / 6, Math.min(Integer.MAX_VALUE, intsInFile));
 
-            reversed = false;
+        if (blockSize == 0) {
+            return 0;
         }
 
-        if (reversed) {
-            new CopyPass(originalFileHandle, dataFileHandle, true).performSortPass();
+        while (intsInFile % blockSize != 0) {
+            blockSize -= 1;
         }
+
+        return blockSize;
     }
 }

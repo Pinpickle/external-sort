@@ -1,7 +1,5 @@
 package uk.ac.cam.cas217.fjava.tick0;
 
-import java.util.Arrays;
-
 public class RadixSort {
     public static int[] radixSortInPlace(int[] input){
         return inplacePartition(input, 0, input.length, 31);
@@ -21,9 +19,7 @@ public class RadixSort {
             if (!bit) {
                 lesserPartition ++;
             } else {
-                int valueInGreaterPartition = toPartition[greaterPartition - 1];
-                toPartition[greaterPartition - 1] = toPartition[lesserPartition];
-                toPartition[lesserPartition] = valueInGreaterPartition;
+                swapIndicesInArray(toPartition, lesserPartition, greaterPartition - 1);
 
                 greaterPartition --;
             }
@@ -40,5 +36,11 @@ public class RadixSort {
         }
 
         return toPartition;
+    }
+
+    private static void swapIndicesInArray(int[] array, int firstIndex, int secondIndex) {
+        int elementAtFirstIndex = array[firstIndex];
+        array[firstIndex] = array[secondIndex];
+        array[secondIndex] = elementAtFirstIndex;
     }
 }
