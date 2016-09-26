@@ -1,17 +1,19 @@
 package uk.ac.cam.cas217.fjava.tick0.merge;
 
+import uk.ac.cam.cas217.fjava.tick0.AsyncFileStream;
+
 import java.io.*;
 
 class MergeSource implements IntegerSource, Closeable {
-    private final DataInputStream inputStream;
+    private final AsyncFileStream inputStream;
 
     private long index;
     private int currentValue;
     private long endIntIndex;
 
     MergeSource(File sourceFile, long startIntIndex, long endIntIndex) throws IOException {
-        inputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(sourceFile)));
-        inputStream.skip(startIntIndex * 4);
+        System.out.println(String.format("Merge source with size %d", endIntIndex - startIntIndex));
+        inputStream = new AsyncFileStream(sourceFile, startIntIndex, endIntIndex);
         index = startIntIndex - 1;
         this.endIntIndex = endIntIndex;
         increaseIndex();
