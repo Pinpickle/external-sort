@@ -2,7 +2,7 @@ package uk.ac.cam.cas217.fjava.tick0.merge;
 
 import java.io.*;
 
-class MergeSource implements Closeable {
+class MergeSource implements IntegerSource, Closeable {
     private final DataInputStream inputStream;
 
     private long index;
@@ -18,18 +18,18 @@ class MergeSource implements Closeable {
     }
 
 
-    void increaseIndex() throws IOException {
+    public void increaseIndex() throws IOException {
         index++;
         if (hasRemaining()) {
             currentValue = inputStream.readInt();
         }
     }
 
-    int getValue() {
+    public int getValue() {
         return currentValue;
     }
 
-    boolean hasRemaining() {
+    public boolean hasRemaining() {
         return index < endIntIndex;
     }
 

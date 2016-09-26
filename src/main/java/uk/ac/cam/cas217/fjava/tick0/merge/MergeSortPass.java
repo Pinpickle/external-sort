@@ -30,12 +30,11 @@ public class MergeSortPass extends ExternalSortPass {
 
         DataOutputStream destinationStream = createDataOutputStream(destinationFile);
 
-        MergeSourceList mergeSourceList = new MergeSourceList(mergeSources);
+        IntegerSourceMerger sourceQueue = new IntegerSourceMerger(mergeSources);
 
-        while(mergeSourceList.hasRemaining()) {
-            destinationStream.writeInt(mergeSourceList.getNextValue());
+        while(sourceQueue.hasRemaining()) {
+            destinationStream.writeInt(sourceQueue.getNextValue());
         }
-
 
         for (MergeSource mergeSource : mergeSources) {
             mergeSource.close();
