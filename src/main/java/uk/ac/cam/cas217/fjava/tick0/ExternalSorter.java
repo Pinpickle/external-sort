@@ -28,6 +28,11 @@ class ExternalSorter {
 
         System.out.println(String.format("Sorting file with bytes: %s", originalFileHandle.length()));
 
+        if (intsInFile <= 1) {
+            // We are done here
+            return;
+        }
+
         if (blockSize == intsInFile) {
             // We can perform the entire sort in memory, no need for the data file
             new MemorySortPass(originalFileHandle, originalFileHandle, blockSize).performSortPass();
