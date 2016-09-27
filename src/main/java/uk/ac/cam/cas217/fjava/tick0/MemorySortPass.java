@@ -37,7 +37,7 @@ class MemorySortPass extends ExternalSortPass {
             valuesToWrite[(int) (index - start)] = inputStream.readInt();
         }
 
-        RadixSort.radixSortInPlace(valuesToWrite);
+        RadixSort.radixSortInPlace(valuesToWrite, (int) (finish - start));
 
         inputStream.close();
 

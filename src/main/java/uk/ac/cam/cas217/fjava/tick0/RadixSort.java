@@ -2,7 +2,11 @@ package uk.ac.cam.cas217.fjava.tick0;
 
 public class RadixSort {
     public static int[] radixSortInPlace(int[] input){
-        return inplacePartition(input, 0, input.length, 31);
+        return radixSortInPlace(input, input.length);
+    }
+
+    public static int[] radixSortInPlace(int[] input, int end) {
+        return inplacePartition(input, 0, end, 31);
     }
 
     private static int[] inplacePartition(int[] toPartition, int start, int end, int place) {

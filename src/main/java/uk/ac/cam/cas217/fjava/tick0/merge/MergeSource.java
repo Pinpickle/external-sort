@@ -12,7 +12,6 @@ class MergeSource implements IntegerSource, Closeable {
     private long endIntIndex;
 
     MergeSource(File sourceFile, long startIntIndex, long endIntIndex) throws IOException {
-        System.out.println(String.format("Merge source with size %d", endIntIndex - startIntIndex));
         inputStream = new AsyncFileStream(sourceFile, startIntIndex, endIntIndex);
         index = startIntIndex - 1;
         this.endIntIndex = endIntIndex;

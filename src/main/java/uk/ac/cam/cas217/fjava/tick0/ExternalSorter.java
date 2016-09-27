@@ -39,16 +39,6 @@ class ExternalSorter {
 
     private long calculateInitialBlockSize(long intsInFile) {
         System.gc();
-        long blockSize = Math.min(Runtime.getRuntime().freeMemory() / 8, Math.min(Integer.MAX_VALUE, intsInFile));
-
-        /*if (blockSize == 0) {
-            return 0;
-        }
-
-        while (intsInFile % blockSize != 0) {
-            blockSize -= 1;
-        }*/
-
-        return blockSize;
+        return Math.min(Runtime.getRuntime().freeMemory() / 7, Math.min(Integer.MAX_VALUE, intsInFile));
     }
 }
