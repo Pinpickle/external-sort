@@ -21,9 +21,11 @@ public class MergeSortPass extends ExternalSortPass {
     }
 
     private void merge() throws IOException {
+        int bufferSize = estimateMergeSourceBufferSize();
+        System.out.println(String.format("Using buffer of %d bytes for merging", bufferSize));
         List<MergeSource> mergeSources = new LinkedList<>();
         for (long index = 0; index < intsInFile; index += blockSize) {
-            mergeSources.add(new MergeSource(sourceFile, Math.min(index, intsInFile), Math.min(index + blockSize, intsInFile)));
+            mergeSources.add(new MergeSource(sourceFile, Math.min(index, intsInFile), Math.min(index + blockSize, intsInFile), bufferSize));
         }
 
         System.out.println(String.format("Merging %d blocks", mergeSources.size()));
@@ -42,6 +44,14 @@ public class MergeSortPass extends ExternalSortPass {
 
         destinationStream.flush();
         destinationStream.close();
+    }
+
+    private int estimateMergeSourceBufferSize() {
+        System.gc();
+        return Math.min(
+            (int) blockSize,
+            (int) Math.min((Runtime.getRuntime().freeMemory() / ((int) Math.ceil((float) intsInFile / (float) blockSize))) / 10, Integer.MAX_VALUE / 4)
+        ) * 4;
     }
 
 }

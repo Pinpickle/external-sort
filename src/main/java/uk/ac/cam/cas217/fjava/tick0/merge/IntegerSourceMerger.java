@@ -40,7 +40,7 @@ class IntegerSourceMerger {
     }
 
     private void buildHeap() {
-        for (int i = this.sources.length - 1; i >= 0; i --) {
+        for (int i = this.sources.length / 2; i >= 0; i --) {
             heapifySources(i);
         }
     }
