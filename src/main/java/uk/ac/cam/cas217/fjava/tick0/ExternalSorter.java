@@ -26,7 +26,7 @@ class ExternalSorter {
         }
 
         long intsInFile = originalFile.length() / 4;
-        long blockSize = calculateInitialBlockSize(intsInFile);
+        int blockSize = calculateInitialBlockSize(intsInFile);
         System.out.println(String.format("Sorting file with bytes: %s", originalFile.length()));
 
         if (intsInFile <= 1) {
@@ -43,8 +43,8 @@ class ExternalSorter {
         }
     }
 
-    private long calculateInitialBlockSize(long intsInFile) {
+    private int calculateInitialBlockSize(long intsInFile) {
         System.gc();
-        return Math.min(Runtime.getRuntime().freeMemory() / 7, Math.min(Integer.MAX_VALUE, intsInFile));
+        return (int) Math.min(Runtime.getRuntime().freeMemory() / 7, Math.min(Integer.MAX_VALUE, intsInFile));
     }
 }

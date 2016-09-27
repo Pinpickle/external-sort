@@ -14,17 +14,17 @@ import java.io.IOException;
  * as the source file. This allows the entire file to be sorted in memory.
  */
 class MemorySortPass extends ExternalSortPass {
-    private long blockSize;
+    private int blockSize;
     private DataOutputStream destinationStreamLazyInit = null;
     private final int[] valuesToWrite;
 
-    MemorySortPass(File sourceFile, File destinationFile, long blockSize) throws IOException {
+    MemorySortPass(File sourceFile, File destinationFile, int blockSize) throws IOException {
         super(sourceFile, destinationFile);
         if ((sourceFile == destinationFile) && (blockSize != intsInFile)) {
             throw new IllegalArgumentException("If source and destination are the same, blockSize must = filesize / 4");
         }
         this.blockSize = blockSize;
-        valuesToWrite = new int[(int) blockSize];
+        valuesToWrite = new int[blockSize];
     }
 
     @Override

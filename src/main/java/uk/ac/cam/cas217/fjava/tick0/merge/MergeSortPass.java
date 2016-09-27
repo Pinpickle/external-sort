@@ -15,9 +15,9 @@ import java.util.List;
  * If n * blockSize > integers in file, the last block may be partially filled.
  */
 public class MergeSortPass extends ExternalSortPass {
-    private final long blockSize;
+    private final int blockSize;
 
-    public MergeSortPass(File sourceFile, File destinationFile, long blockSize) throws IOException {
+    public MergeSortPass(File sourceFile, File destinationFile, int blockSize) throws IOException {
         super(sourceFile, destinationFile);
         this.blockSize = blockSize;
     }
@@ -59,7 +59,7 @@ public class MergeSortPass extends ExternalSortPass {
     private int estimateMergeSourceBufferSize() {
         System.gc();
         return Math.min(
-            (int) blockSize,
+            blockSize,
             (int) Math.min((Runtime.getRuntime().freeMemory() / ((int) Math.ceil((float) intsInFile / (float) blockSize))) / 10, Integer.MAX_VALUE / 4)
         ) * 4;
     }
