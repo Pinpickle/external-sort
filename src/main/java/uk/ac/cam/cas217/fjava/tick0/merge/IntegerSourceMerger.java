@@ -1,11 +1,13 @@
 package uk.ac.cam.cas217.fjava.tick0.merge;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-class IntegerSourceMerger {
+/**
+ * Merges together multiple {@link IntegerSource}s with the assumption that they are sorted. The resulting integer source
+ * that this exposes will also be sorted.
+ */
+class IntegerSourceMerger implements IntegerSource {
     private final IntegerSource[] sources;
     private int sourcesWithRemaining;
 
@@ -16,33 +18,43 @@ class IntegerSourceMerger {
         buildHeap();
     }
 
-    boolean hasRemaining() {
+    public boolean hasRemaining() {
         return sourcesWithRemaining > 0;
     }
 
-    int getNextValue() throws IOException {
-        IntegerSource smallestSource = sources[0];
-
-        int smallestValue = sources[0].getValue();
-        sources[0].increaseIndex();
-
-        if (!smallestSource.hasRemaining()) {
-            sources[0] = sources[sourcesWithRemaining - 1];
-            sources[sourcesWithRemaining - 1] = smallestSource;
-            sourcesWithRemaining -= 1;
-        }
-
-        if (hasRemaining()) {
-            heapifySources(0);
-        }
-
-        return smallestValue;
+    public int getValue() {
+        return sources[0].getValue();
     }
 
+    @Override
+    public void readyyNextIndex() throws IOException {
+        sources[0].readyyNextIndex();
+
+        if (!sources[0].hasRemaining()) {
+            removeTopOfHeap();
+        } else {
+            heapifySources(0);
+        }
+    }
+
+    /**
+     * A priority queue backed by a heap is used to keep {@link IntegerSource}s in the correct order. This builds the
+     * initial heap.
+     */
     private void buildHeap() {
         for (int i = this.sources.length / 2; i >= 0; i --) {
             heapifySources(i);
         }
+    }
+
+    private void removeTopOfHeap() {
+        IntegerSource topOfHeap = sources[0];
+
+        sources[0] = sources[sourcesWithRemaining - 1];
+        sources[sourcesWithRemaining - 1] = topOfHeap;
+        sourcesWithRemaining -= 1;
+
+        heapifySources(0);
     }
 
     private void heapifySources(int startIndex) {

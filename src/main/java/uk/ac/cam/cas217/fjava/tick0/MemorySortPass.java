@@ -1,7 +1,18 @@
 package uk.ac.cam.cas217.fjava.tick0;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 
+/**
+ * Sort pass that sorts blocks of the file in memory and writes them to the destination file.
+ *
+ * If and only if the block size is equal to the number of integers in the file, the destination file may be the same
+ * as the source file. This allows the entire file to be sorted in memory.
+ */
 class MemorySortPass extends ExternalSortPass {
     private long blockSize;
     private DataOutputStream destinationStreamLazyInit = null;

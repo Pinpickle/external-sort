@@ -37,7 +37,8 @@ public class IntegerSourceMergerTest {
     }
 
     private void assertSourcesValue(IntegerSourceMerger sources, int value) throws IOException {
-        Assert.assertEquals(value, sources.getNextValue());
+        Assert.assertEquals(value, sources.getValue());
+        sources.readyyNextIndex();
     }
 
     private static class IntegerSourceMock implements IntegerSource {
@@ -53,7 +54,7 @@ public class IntegerSourceMergerTest {
         }
 
         @Override
-        public void increaseIndex() throws IOException {
+        public void readyyNextIndex() throws IOException {
             toSend.remove(0);
         }
 

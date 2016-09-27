@@ -5,7 +5,7 @@ import org.junit.Test;
 import java.util.Random;
 import java.util.stream.IntStream;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
 
 public class InPlaceSortTest {
     @Test

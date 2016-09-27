@@ -2,15 +2,13 @@ package uk.ac.cam.cas217.fjava.tick0;
 
 import uk.ac.cam.cas217.fjava.tick0.merge.MergeSortPass;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Sorts a data file using a temporary file as a data store
- *
- * Temporary file has to be of the same size as the data file
  */
 class ExternalSorter {
-    private long availableMemory = 1000000;
     private final String originalFilePath;
     private final String dataFilePath;
 
@@ -20,13 +18,16 @@ class ExternalSorter {
     }
 
     void sort() throws IOException {
-        File originalFileHandle = new File(originalFilePath);
-        File dataFileHandle = new File(dataFilePath);
+        File originalFile = new File(originalFilePath);
+        File dataFile = new File(dataFilePath);
 
-        long intsInFile = originalFileHandle.length() / 4;
+        if (originalFile.length() % 4 != 0) {
+            throw new IllegalArgumentException("The file to sort must contain only integers. Its length must be divisible by 4");
+        }
+
+        long intsInFile = originalFile.length() / 4;
         long blockSize = calculateInitialBlockSize(intsInFile);
-
-        System.out.println(String.format("Sorting file with bytes: %s", originalFileHandle.length()));
+        System.out.println(String.format("Sorting file with bytes: %s", originalFile.length()));
 
         if (intsInFile <= 1) {
             // We are done here
@@ -35,10 +36,10 @@ class ExternalSorter {
 
         if (blockSize == intsInFile) {
             // We can perform the entire sort in memory, no need for the data file
-            new MemorySortPass(originalFileHandle, originalFileHandle, blockSize).performSortPass();
+            new MemorySortPass(originalFile, originalFile, blockSize).performSortPass();
         } else {
-            new MemorySortPass(originalFileHandle, dataFileHandle, blockSize).performSortPass();
-            new MergeSortPass(dataFileHandle, originalFileHandle, blockSize).performSortPass();
+            new MemorySortPass(originalFile, dataFile, blockSize).performSortPass();
+            new MergeSortPass(dataFile, originalFile, blockSize).performSortPass();
         }
     }
 
