@@ -5,6 +5,9 @@ import uk.ac.cam.cas217.fjava.tick0.ExternalSortPass;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.file.StandardOpenOption;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -40,20 +43,11 @@ public class MergeSortPass extends ExternalSortPass {
 
         System.out.println(String.format("Merging %d blocks", fileIntegerSources.size()));
 
-        DataOutputStream destinationStream = createDataOutputStream(destinationFile);
-        IntegerSource sortedIntegerSource = new IntegerSourceMerger(fileIntegerSources);
-
-        while(sortedIntegerSource.hasRemaining()) {
-            destinationStream.writeInt(sortedIntegerSource.getValue());
-            sortedIntegerSource.readyyNextIndex();
-        }
-
-        for (FileIntegerSource fileIntegerSource : fileIntegerSources) {
-            fileIntegerSource.close();
-        }
-
-        destinationStream.flush();
-        destinationStream.close();
+        ReadableByteChannel sortedIntegerSource = new IntegerSourceMerger(fileIntegerSources);
+        FileChannel destinationChannel = FileChannel.open(destinationFile.toPath(), StandardOpenOption.WRITE);
+        destinationChannel.transferFrom(sortedIntegerSource, 0, destinationFile.length());
+        destinationChannel.close();
+        sortedIntegerSource.close();
     }
 
     private int estimateMergeSourceBufferSize() {

@@ -4,6 +4,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,24 +23,19 @@ public class IntegerSourceMergerTest {
             )
         );
 
-        assertSourcesValue(sources, 9);
-        assertSourcesValue(sources, 10);
-        assertSourcesValue(sources, 15);
-        assertSourcesValue(sources, 16);
-        assertSourcesValue(sources, 77);
-        assertSourcesValue(sources, 83);
-        assertSourcesValue(sources, 100);
-        assertSourcesValue(sources, 112);
-        assertSourcesValue(sources, 115);
-        assertSourcesValue(sources, 142);
-        assertSourcesValue(sources, 1000);
+        ByteBuffer buffer = ByteBuffer.allocate(400);
 
-        Assert.assertFalse(sources.hasRemaining());
-    }
+        sources.read(buffer);
+        buffer.flip();
 
-    private void assertSourcesValue(IntegerSourceMerger sources, int value) throws IOException {
-        Assert.assertEquals(value, sources.getValue());
-        sources.readyyNextIndex();
+        IntBuffer intBuffer = buffer.asIntBuffer();
+        int[] ints = new int[intBuffer.limit()];
+        intBuffer.get(ints);
+
+        Assert.assertArrayEquals(
+            new int[] {9, 10, 15, 16, 77, 83, 100, 112, 115, 142, 1000},
+            ints
+        );
     }
 
     private static class IntegerSourceMock implements IntegerSource {
@@ -62,5 +59,8 @@ public class IntegerSourceMergerTest {
         public int getValue() {
             return toSend.get(0);
         }
+
+        @Override
+        public void close() throws IOException { }
     }
 }
