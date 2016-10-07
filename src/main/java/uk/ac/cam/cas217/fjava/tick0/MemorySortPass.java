@@ -6,6 +6,8 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
+import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 
 /**
@@ -16,8 +18,7 @@ import java.util.Arrays;
  */
 class MemorySortPass extends ExternalSortPass {
     private int blockSize;
-    private DataOutputStream destinationStreamLazyInit = null;
-    private final int[] valuesToWrite;
+    private final IntegerArrayByteChannel valuesToWrite;
 
     MemorySortPass(File sourceFile, File destinationFile, int blockSize) throws IOException {
         super(sourceFile, destinationFile);
@@ -25,7 +26,7 @@ class MemorySortPass extends ExternalSortPass {
             throw new IllegalArgumentException("If source and destination are the same, blockSize must = filesize / 4");
         }
         this.blockSize = blockSize;
-        valuesToWrite = new int[blockSize];
+        valuesToWrite = new IntegerArrayByteChannel(blockSize);
     }
 
     @Override
@@ -36,41 +37,23 @@ class MemorySortPass extends ExternalSortPass {
             sortBlock(offset);
         }
 
-        getDestinationStreamLazily().close();
+        valuesToWrite.close();
     }
 
     private void sortBlock(long offset) throws IOException {
-        DataInputStream inputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(sourceFile)));
+        valuesToWrite.resetReadWrite();
+
+        FileChannel sourceChannel = FileChannel.open(sourceFile.toPath(), StandardOpenOption.READ);
+
         long start = blockSize * offset;
         long finish = Math.min(start + blockSize, intsInFile);
-        inputStream.skip(start * 4);
+        sourceChannel.transferTo(start * 4, (finish - start) * 4, valuesToWrite);
+        sourceChannel.close();
 
-        for (long index = start; index < finish; index ++) {
-            valuesToWrite[(int) (index - start)] = inputStream.readInt();
-        }
+        InPlaceSort.sortInPlace(valuesToWrite.getIntegers(), (int) (finish - start));
 
-        InPlaceSort.sortInPlace(valuesToWrite, (int) (finish - start));
-
-        inputStream.close();
-
-        DataOutputStream destinationStream = getDestinationStreamLazily();
-
-        for (long index = start; index < finish; index ++) {
-            destinationStream.writeInt(valuesToWrite[(int) (index - start)]);
-        }
-
-        destinationStream.flush();
-    }
-
-    /**
-     * We create the destination stream on the first time that we need it, as it erases the destination file when it is
-     * created. This way, if there is only one pass done, read and write can be on the same file.
-     */
-    private DataOutputStream getDestinationStreamLazily() throws IOException {
-        if (destinationStreamLazyInit == null) {
-            destinationStreamLazyInit = FileUtils.createDataOutputStream(destinationFile);
-        }
-
-        return destinationStreamLazyInit;
+        FileChannel desinationChannel = FileChannel.open(destinationFile.toPath(), StandardOpenOption.WRITE);
+        desinationChannel.transferFrom(valuesToWrite, start * 4, (finish - start) * 4);
+        desinationChannel.close();
     }
 }
