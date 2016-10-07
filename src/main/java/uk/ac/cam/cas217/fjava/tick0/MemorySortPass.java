@@ -6,6 +6,7 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * Sort pass that sorts blocks of the file in memory and writes them to the destination file.
@@ -48,6 +49,7 @@ class MemorySortPass extends ExternalSortPass {
             valuesToWrite[(int) (index - start)] = inputStream.readInt();
         }
 
+        //Arrays.sort(valuesToWrite, 0, (int) (finish - start));
         InPlaceSort.sortInPlace(valuesToWrite, (int) (finish - start));
 
         inputStream.close();
@@ -67,7 +69,7 @@ class MemorySortPass extends ExternalSortPass {
      */
     private DataOutputStream getDestinationStreamLazily() throws IOException {
         if (destinationStreamLazyInit == null) {
-            destinationStreamLazyInit = createDataOutputStream(destinationFile);
+            destinationStreamLazyInit = FileUtils.createDataOutputStream(destinationFile);
         }
 
         return destinationStreamLazyInit;

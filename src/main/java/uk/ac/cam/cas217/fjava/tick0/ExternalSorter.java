@@ -1,5 +1,7 @@
 package uk.ac.cam.cas217.fjava.tick0;
 
+import uk.ac.cam.cas217.fjava.tick0.counting.CountingSortPass;
+import uk.ac.cam.cas217.fjava.tick0.counting.IntegerFileRangeFinder;
 import uk.ac.cam.cas217.fjava.tick0.merge.MergeSortPass;
 
 import java.io.File;
@@ -30,11 +32,16 @@ class ExternalSorter {
         System.out.println(String.format("Sorting file with bytes: %s", originalFile.length()));
 
         if (intsInFile <= 1) {
-            // We are done here
+            System.out.println("File is already sorted");
             return;
         }
 
-        if (blockSize == intsInFile) {
+        IntegerFileRangeFinder.IntegerFileRange integerRange = new IntegerFileRangeFinder(originalFile).getIntegerRange();
+
+        if (integerRange.getRange() <= blockSize) {
+            // The range of integers is sufficiently small so we can perform counting sort on the whole file
+            new CountingSortPass(originalFile, integerRange.getMinimum(), (int) integerRange.getRange() + 1).performSortPass();
+        } else if (blockSize == intsInFile) {
             // We can perform the entire sort in memory, no need for the data file
             new MemorySortPass(originalFile, originalFile, blockSize).performSortPass();
         } else {

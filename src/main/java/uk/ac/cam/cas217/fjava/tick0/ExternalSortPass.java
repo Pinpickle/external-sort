@@ -23,7 +23,4 @@ abstract public class ExternalSortPass {
 
     public abstract void performSortPass() throws IOException;
 
-    protected DataOutputStream createDataOutputStream(File file) throws IOException {
-        return new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
-    }
 }

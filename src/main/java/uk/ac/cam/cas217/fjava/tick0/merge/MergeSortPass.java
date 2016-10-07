@@ -2,7 +2,6 @@ package uk.ac.cam.cas217.fjava.tick0.merge;
 
 import uk.ac.cam.cas217.fjava.tick0.ExternalSortPass;
 
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
