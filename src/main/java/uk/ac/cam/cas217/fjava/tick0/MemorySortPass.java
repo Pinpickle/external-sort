@@ -49,7 +49,6 @@ class MemorySortPass extends ExternalSortPass {
             valuesToWrite[(int) (index - start)] = inputStream.readInt();
         }
 
-        //Arrays.sort(valuesToWrite, 0, (int) (finish - start));
         InPlaceSort.sortInPlace(valuesToWrite, (int) (finish - start));
 
         inputStream.close();

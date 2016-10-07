@@ -25,11 +25,11 @@ public class CountingSortPass extends ExternalSortPass {
         CountingSorter sorter = new CountingSorter(offset, count);
 
         FileChannel sourceChannel = FileChannel.open(sourceFile.toPath(), StandardOpenOption.READ);
-        System.out.println(sourceChannel.transferTo(0, sourceChannel.size(), sorter));
+        sourceChannel.transferTo(0, sourceChannel.size(), sorter);
         sourceChannel.close();
 
         FileChannel destinationChannel = FileChannel.open(destinationFile.toPath(), StandardOpenOption.WRITE);
-        System.out.println(destinationChannel.transferFrom(sorter, 0, destinationChannel.size()));
+        destinationChannel.transferFrom(sorter, 0, destinationChannel.size());
         destinationChannel.close();
 
         sorter.close();

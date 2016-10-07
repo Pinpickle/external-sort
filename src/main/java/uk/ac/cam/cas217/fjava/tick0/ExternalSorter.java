@@ -12,16 +12,16 @@ import java.io.IOException;
  */
 class ExternalSorter {
     private final String originalFilePath;
-    private final String dataFilePath;
+    private final String temporaryFilePath;
 
     ExternalSorter(String originalFile, String temporaryFile) {
         originalFilePath = originalFile;
-        dataFilePath = temporaryFile;
+        temporaryFilePath = temporaryFile;
     }
 
     void sort() throws IOException {
         File originalFile = new File(originalFilePath);
-        File dataFile = new File(dataFilePath);
+        File temporaryFile = new File(temporaryFilePath);
 
         if (originalFile.length() % 4 != 0) {
             throw new IllegalArgumentException("The file to sort must contain only integers. Its length must be divisible by 4");
@@ -45,8 +45,8 @@ class ExternalSorter {
             // We can perform the entire sort in memory, no need for the data file
             new MemorySortPass(originalFile, originalFile, blockSize).performSortPass();
         } else {
-            new MemorySortPass(originalFile, dataFile, blockSize).performSortPass();
-            new MergeSortPass(dataFile, originalFile, blockSize).performSortPass();
+            new MemorySortPass(originalFile, temporaryFile, blockSize).performSortPass();
+            new MergeSortPass(temporaryFile, originalFile, blockSize).performSortPass();
         }
     }
 
