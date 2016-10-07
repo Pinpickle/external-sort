@@ -30,6 +30,7 @@ public class InPlaceSort {
             boolean bit = ((toPartition[lesserPartition] >> place) & 1) == 1;
 
             if (place == 31) {
+                // This is the sign bit, we need to sort from greatest to smallest
                 bit = !bit;
             }
 
