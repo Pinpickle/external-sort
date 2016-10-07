@@ -1,4 +1,4 @@
-package uk.ac.cam.cas217.fjava.tick0;
+package uk.ac.cam.cas217.fjava.tick0.utils;
 
 import org.junit.Test;
 import uk.ac.cam.cas217.fjava.tick0.utils.InPlaceSort;

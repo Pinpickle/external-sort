@@ -51,7 +51,7 @@ public class IntegerSourceMergerTest {
         }
 
         @Override
-        public void readyyNextIndex() throws IOException {
+        public void readyNextIndex() throws IOException {
             toSend.remove(0);
         }
 

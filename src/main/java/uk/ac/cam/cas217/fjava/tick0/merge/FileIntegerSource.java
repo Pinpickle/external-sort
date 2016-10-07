@@ -22,20 +22,23 @@ class FileIntegerSource implements IntegerSource, Closeable {
         inputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(sourceFile), bufferSize));
         inputStream.skip(startIntIndex * 4);
         intIndex = startIntIndex - 1;
-        readyyNextIndex();
+        readyNextIndex();
     }
 
-    public void readyyNextIndex() throws IOException {
+    @Override
+    public void readyNextIndex() throws IOException {
         intIndex++;
         if (hasRemaining()) {
             currentValue = inputStream.readInt();
         }
     }
 
+    @Override
     public int getValue() {
         return currentValue;
     }
 
+    @Override
     public boolean hasRemaining() {
         return intIndex < endIntIndex;
     }

@@ -44,7 +44,7 @@ class IntegerSourceMerger implements ReadableByteChannel {
         int bytes = 0;
         while (hasRemaining() && (dst.remaining() >= 4)) {
             dst.putInt(getValue());
-            readyyNextIndex();
+            readyNextIndex();
             bytes += 4;
         }
 
@@ -59,8 +59,8 @@ class IntegerSourceMerger implements ReadableByteChannel {
         return sources[0].getValue();
     }
 
-    private void readyyNextIndex() throws IOException {
-        sources[0].readyyNextIndex();
+    private void readyNextIndex() throws IOException {
+        sources[0].readyNextIndex();
 
         if (!sources[0].hasRemaining()) {
             removeTopOfHeap();
