@@ -1,6 +1,7 @@
 package uk.ac.cam.cas217.fjava.tick0;
 
 import org.junit.Test;
+import uk.ac.cam.cas217.fjava.tick0.utils.InPlaceSort;
 
 import java.util.Random;
 import java.util.stream.IntStream;

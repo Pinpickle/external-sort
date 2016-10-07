@@ -1,14 +1,12 @@
 package uk.ac.cam.cas217.fjava.tick0;
 
-import java.io.BufferedInputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import uk.ac.cam.cas217.fjava.tick0.utils.InPlaceSort;
+import uk.ac.cam.cas217.fjava.tick0.utils.IntegerArrayByteChannel;
+
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
-import java.util.Arrays;
 
 /**
  * Sort pass that sorts blocks of the file in memory and writes them to the destination file.
